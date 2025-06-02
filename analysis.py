@@ -6,19 +6,29 @@ import os
 print(os.getcwd())
 
 # Dataset: 2010 to till date daily trends of NASDAQ-100 Stocks
-df = pd.read_csv('NASDAQ100.csv', sep='\t', parse_dates=[0], index_col=0)
+df = pd.read_csv('NASDAQ100.csv', sep='\t', parse_dates=["Date"], index_col="Date")
 
 # Basic EDA
 print(df.columns)
 print(df.dtypes)
-print(df.index.dtype)
+print(df.index)
 
 # Visual EDA
 # 1) Plot historical closing prices over time
-plt.figure(figsize=(10, 4))
-df['Adj Close'].plot(title='Historical Closing Prices')
-plt.ylabel('Close Price')
-plt.grid(True)
+# Pivot so that each ticker name is a column of its own 'Adj Close'
+
+pivoted = df.pivot_table(index="Date", columns='Name', values='Adj Close')
+
+# Sort columns alphabetically so the order is consistent everywhere
+pivoted = pivoted.reindex(sorted(pivoted.columns), axis=1)
+
+# Plot all tickers’ Adj Close together (legend=False hides the overcrowded legend)
+plt.figure(figsize=(12, 6))
+pivoted.plot(legend=False)
+plt.title("All NASDAQ-100 Companies: Historical Adjusted Close")
+plt.xlabel("Date")
+plt.ylabel("Adj Close (USD)")
+plt.grid(True, linestyle='--', alpha=0.3)
 plt.tight_layout()
 plt.show();
 
