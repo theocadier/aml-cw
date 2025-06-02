@@ -32,29 +32,27 @@ plt.grid(True, linestyle='--', alpha=0.3)
 plt.tight_layout()
 plt.show();
 
-# 2) Compute and plot a 30-day rolling moving average of Close
+# 2) Compute and plot a 30-day rolling moving average of Closing Price
 rolling_window = 30
 df['30D_MA'] = df['Adj Close'].rolling(window=rolling_window).mean()
 
-plt.figure(figsize=(10, 4))
-df['Adj Close'].plot(label='Closing Price', alpha=0.6)
-df['30D_MA'].plot(label=f'{rolling_window}-Day MA', color='orange')
-plt.title(f'Close Price vs {rolling_window}-Day Moving Average')
+# Compute the daily average across all tickers
+market_avg = pivoted.mean(axis=1)
+
+# 30-day moving average of that market-wide series
+market_avg_ma30 = market_avg.rolling(window=30).mean()
+
+plt.figure(figsize=(10,4))
+market_avg.plot(label="Market Avg Adj Close", alpha=0.6)
+market_avg_ma30.plot(label="30-Day MA of Market Avg", color="orange")
+plt.title("NASDAQ-100 Average Adjusted Close vs 30-Day MA")
 plt.legend()
-plt.ylabel('Price')
-plt.grid(True)
+plt.ylabel("Price (USD)")
+plt.grid(True, linestyle="--", alpha=0.5)
 plt.tight_layout()
 plt.show();
 
-# 3) Plot trading volume over time
-plt.figure(figsize=(10, 3))
-df['Volume'].plot(title='Trading Volume Over Time', color='green')
-plt.ylabel('Volume')
-plt.grid(True)
-plt.tight_layout()
-plt.show();
-
-# 4) Calculate daily returns (% returns) and plot distribution
+# 3) Calculate daily returns (% returns) and plot distribution
 df['Log_Returns'] = (df['Adj Close'] / df['Adj Close'].shift(1)).apply(lambda x: np.log(x))
 df['Log_Returns'].dropna(inplace=True)
 
